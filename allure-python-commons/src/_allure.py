@@ -110,37 +110,58 @@ class Dynamic(object):
         Dynamic.link(url, link_type=LinkType.TEST_CASE, name=name)
 
 
-def step(title):
-    if callable(title):
-        return StepContext(title.__name__, ({}, {}))(title)
+def step(dest=None, flatten=False, force=False):
+    if callable(dest):
+        return StepContext(dest.__name__, ({}, {}), flatten, force)(dest)
     else:
-        return StepContext(title, ({}, {}))
+        return StepContext(dest, ({}, {}), flatten, force)
 
 
 class StepContext:
 
-    def __init__(self, title, params):
+    _flatten_active_steps = []
+    _flattened_steps = []
+
+    def __init__(self, title, params, flatten=False, force=False):
         self.title = title
         self.params = params
         self.uuid = uuid4()
+        self.flatten = flatten
+        self.force = force
 
     def __enter__(self):
         args, kwargs = self.params
         args.update(kwargs)
         params = list(args.items())
-        plugin_manager.hook.start_step(uuid=self.uuid, title=self.title, params=params)
+
+        if not self._flatten_active_steps or self.force:
+            plugin_manager.hook.start_step(uuid=self.uuid, title=self.title, params=params)
+            if self.flatten:
+                # skip child ones until step finishes
+                self._flatten_active_steps.append(self.uuid)
+        else:
+            # skip
+            self._flattened_steps.append(self.uuid)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        plugin_manager.hook.stop_step(uuid=self.uuid, title=self.title, exc_type=exc_type, exc_val=exc_val,
-                                      exc_tb=exc_tb)
+        if self.uuid in self._flattened_steps:
+            self._flattened_steps.remove(self.uuid)
+        else:
+            if self.uuid in self._flatten_active_steps:
+                self._flatten_active_steps.remove(self.uuid)
+            plugin_manager.hook.stop_step(uuid=self.uuid, title=self.title, exc_type=exc_type, exc_val=exc_val,
+                                          exc_tb=exc_tb)
 
     def __call__(self, func):
+        if self.title is None:
+            self.title = func.__name__
+
         @wraps(func)
         def impl(*a, **kw):
             __tracebackhide__ = True
             params = func_parameters(func, *a, **kw)
             args, kwargs = params
-            with StepContext(self.title.format(*args.values(), **kwargs), params):
+            with StepContext(self.title.format(*args.values(), **kwargs), params, self.flatten, self.force):
                 return func(*a, **kw)
         return impl
 
