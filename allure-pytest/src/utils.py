@@ -3,19 +3,20 @@ from __future__ import unicode_literals
 
 import six
 import pytest
+import allure
 from itertools import chain, islice
 from allure_commons.utils import represent
 from allure_commons.utils import format_exception, format_traceback, escape_non_unicode_symbols
 from allure_commons.model2 import Status
 from allure_commons.model2 import StatusDetails
-from allure_commons.types import LabelType
+from allure_commons.types import LabelType, Severity
 
 ALLURE_TITLE = 'allure_title'
 ALLURE_DESCRIPTION = 'allure_description'
 ALLURE_DESCRIPTION_HTML = 'allure_description_html'
 ALLURE_LABEL_PREFIX = 'allure_label'
 ALLURE_LINK_PREFIX = 'allure_link'
-ALLURE_UNIQUE_LABELS = ['severity', 'thread', 'host']
+ALLURE_UNIQUE_LABELS = [LabelType.SEVERITY, LabelType.THREAD, LabelType.HOST]
 
 
 def get_marker_value(item, keyword):
@@ -40,6 +41,8 @@ def allure_description_html(item):
 
 
 def allure_labels(item):
+    if '{}.{}'.format(ALLURE_LABEL_PREFIX, LabelType.SEVERITY) not in item.keywords.keys():
+        item.add_marker(allure.severity(Severity.NORMAL))
     for keyword in item.keywords.keys():
         if keyword.startswith(ALLURE_LABEL_PREFIX):
             marker = item.get_closest_marker(keyword)

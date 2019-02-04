@@ -23,6 +23,18 @@ def test_function_with_trivial_severity():
     pass
 
 
+def test_function_with_default_severity():
+    """
+    >>> allure_report = getfixture('allure_report_with_params')('--allure-severities=normal')
+    >>> assert_that(allure_report,
+    ...             has_test_case('test_function_with_default_severity',
+    ...                           with_status('passed')
+    ...             )
+    ... )
+    """
+    pass
+
+
 class TestClass(object):
 
     @allure.severity(allure.severity_level.TRIVIAL)
