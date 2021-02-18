@@ -395,7 +395,7 @@ def get_testplan():
     planned_tests = []
     file_path = os.environ.get("ALLURE_TESTPLAN_PATH")
 
-    if file_path:
+    if file_path and os.path.exists(file_path):
         with open(file_path, 'r') as plan_file:
             plan = json.load(plan_file)
             planned_tests = plan.get("tests", [])
