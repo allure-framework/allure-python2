@@ -92,8 +92,10 @@ class AllureListener(object):
         test_result.testCaseId = md5(full_name)
         test_result.description = allure_description(item)
         test_result.descriptionHtml = allure_description_html(item)
+        current_param_names = [param.name for param in test_result.parameters]
         test_result.parameters.extend(
-            [Parameter(name=name, value=represent(value)) for name, value in params.items()])
+            [Parameter(name=name, value=represent(value)) for name, value in params.items()
+             if name not in current_param_names])
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_call(self, item):
@@ -258,6 +260,15 @@ class AllureListener(object):
         test_result = self.allure_logger.get_test(None)
         for label in labels if test_result else ():
             test_result.labels.append(Label(label_type, label))
+
+    @allure_commons.hookimpl
+    def add_parameter(self, name, value):
+        test_result: TestResult = self.allure_logger.get_test(None)
+        existed_parameter = list(filter(lambda x: x.name == name, test_result.parameters))
+        if existed_parameter:
+            existed_parameter[0].value = represent(value)
+        else:
+            test_result.parameters.append(Parameter(name=name, value=represent(value)))
 
 
 class ItemCache(object):
