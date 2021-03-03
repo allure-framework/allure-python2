@@ -83,6 +83,12 @@ def pytest_addoption(parser):
                                          help="""Comma-separated list of story names.
                                          Run tests that have at least one of the specified story labels.""")
 
+    parser.getgroup("general").addoption('--allure-labels-exclusive',
+                                         action="store_true",
+                                         dest="allure_labels_exclusive",
+                                         help="""Exclusive filtered tests by labels.
+                                         Run tests if all specified labels is present.""")
+
     def link_pattern(string):
         pattern = string.split(':', 1)
         if not pattern[0]:
@@ -141,12 +147,42 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "{mark}: allure description html".format(mark=ALLURE_DESCRIPTION_HTML_MARK))
 
 
+def get_arg_labels(config):
+    return set().union(
+        config.option.allure_epics,
+        config.option.allure_features,
+        config.option.allure_stories,
+        config.option.allure_severities
+    )
+
+
 def select_by_labels(items, config):
-    arg_labels = set().union(config.option.allure_epics,
-                             config.option.allure_features,
-                             config.option.allure_stories,
-                             config.option.allure_severities)
+    arg_labels = get_arg_labels(config)
     return filter(lambda item: arg_labels & set(allure_labels(item)) if arg_labels else True, items)
+
+
+def select_by_labels_exclusive(items, config):
+    if config.option.allure_labels_exclusive:
+        arg_labels_info = get_arg_labels(config)
+        arg_labels_count = len(arg_labels_info)
+
+        filtered_items = []
+        for item in items:
+            item_labels_map = {
+                mark.kwargs.get('label_type'): mark.args for mark in item.iter_markers()
+                if mark.kwargs.get('label_type')
+            }
+
+            match_count = 0
+            for label_type, label_value in arg_labels_info:
+                if label_value.strip() in item_labels_map.get(label_type, []):
+                    match_count += 1
+
+            if match_count == arg_labels_count:
+                filtered_items.append(item)
+
+        return filtered_items
+    return items
 
 
 def select_by_testcase(items):
@@ -175,3 +211,4 @@ def select_by_testcase(items):
 def pytest_collection_modifyitems(items, config):
     items[:] = select_by_testcase(items)
     items[:] = select_by_labels(items, config)
+    items[:] = select_by_labels_exclusive(items, config)

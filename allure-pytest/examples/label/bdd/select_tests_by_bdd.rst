@@ -36,8 +36,20 @@ There are some tests marked with BDD labels:
     ... def test_with_another_epic_feature_story():
     ...     pass
 
-If you run ``pytest`` with following options: ``$ pytest tests.py --allure-epics=My Epic --alluredir=./report`` first
-three tests will be runned.
+* If you run ``pytest`` with following options::
 
-And with next options: ``$ pytest tests.py --allure-stories=My Story, Another Story --alluredir=./report`` it will
-run just are first and last test.
+    $ pytest tests.py --allure-epics=My Epic --alluredir=./report
+
+  first three tests will be runned.
+
+* And with next options::
+
+    $ pytest tests.py --allure-stories=My Story, Another Story --alluredir=./report
+
+  it will run just are first and last test.
+
+* If set ``--allure-labels-exclusive`` option, you also can run test by several labels specified::
+
+    $ pytest tests.py --allure-labels-exclusive --allure-epics=My Epic --allure-features=My Feature --alluredir=./report
+
+  it will run only first two tests.
