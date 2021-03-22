@@ -31,6 +31,7 @@ class LabelType(str):
     ID = 'as_id'
     FRAMEWORK = 'framework'
     LANGUAGE = 'language'
+    PACKAGE = 'package'
 
 
 class AttachmentType(Enum):
