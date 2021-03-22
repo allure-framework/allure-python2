@@ -17,6 +17,8 @@ from functools import partial
 from allure_commons.lifecycle import AllureLifecycle
 from .utils import get_full_name, get_name, get_params
 
+from .attachment_worker import AttachmentWorker
+
 
 class PytestBDDListener(object):
     def __init__(self):
@@ -112,6 +114,9 @@ class PytestBDDListener(object):
                 if test_result.status == Status.PASSED and status != Status.PASSED:
                     test_result.status = status
                     test_result.statusDetails = status_details
+
+            if test_result and test_result.status:
+                AttachmentWorker(test_result, item).delete_duplicates()
 
         if report.when == 'teardown':
             self.lifecycle.write_test_case(uuid=uuid)
