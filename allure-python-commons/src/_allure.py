@@ -121,6 +121,10 @@ class Dynamic(object):
         plugin_manager.hook.add_link(url=url, link_type=link_type, name=name)
 
     @staticmethod
+    def parameter(name, value):
+        plugin_manager.hook.add_parameter(name=name, value=value)
+
+    @staticmethod
     def issue(url, name=None):
         Dynamic.link(url, link_type=LinkType.ISSUE, name=name)
 
