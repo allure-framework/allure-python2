@@ -141,12 +141,13 @@ def allure_suite_labels(item):
 
 
 def escape_name(name):
+    name = name.replace("\\", '\\\\')
     if six.PY2:
         try:
             name.decode('string_escape').encode('unicode_escape')
         except UnicodeDecodeError:
             return name.decode('string_escape').decode('utf-8')
-    return name.encode('ascii', 'backslashreplace').decode('unicode_escape')
+    return name.encode('ascii').decode('unicode_escape')
 
 
 def get_outcome_status(outcome):
