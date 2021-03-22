@@ -124,3 +124,47 @@ def test_capture_disabled(allured_testdir):
     assert_that(allured_testdir.allure_report,
                 has_property("attachments", empty())
                 )
+
+
+def test_capture_passed_disabled_for_successful(allured_testdir):
+    """
+    >>> import logging
+    >>> logger = logging.getLogger(__name__)
+
+    >>> def test_capture_passed_disabled_example():
+    ...     logger.info("Start logging")
+    ...     print ("Start printing")
+
+    """
+
+    allured_testdir.parse_docstring_source()
+    allured_testdir.run_with_allure("--log-cli-level=INFO", "--allure-no-capture-passed")
+
+    assert_that(allured_testdir.allure_report,
+                has_property("attachments", empty())
+                )
+
+
+def test_capture_passed_disabled_for_unsuccessful(allured_testdir):
+    """
+    >>> import logging
+    >>> logger = logging.getLogger(__name__)
+
+    >>> def test_capture_passed_disabled_example():
+    ...     logger.info("Start logging")
+    ...     print ("Start printing")
+    ...     assert False
+
+    """
+
+    allured_testdir.parse_docstring_source()
+    allured_testdir.run_with_allure("--log-cli-level=INFO", "--allure-no-capture-passed")
+
+    assert_that(allured_testdir.allure_report,
+                has_property("attachments",
+                             all_of(
+                                 is_(has_value(contains_string("Start logging"))),
+                                 is_(has_value(contains_string("Start printing")))
+                             )
+                             )
+                )
