@@ -25,7 +25,7 @@ Optional argument sets output directory. Example:
 
 .. code:: bash
 
-    $ robot --listener allure_robotframework;/set/your/path/here ./my_robot_test
+    $ robot --listener allure_robotframework:/set/your/path/here ./my_robot_test
 
 Default output directory is `output/allure`.
 
