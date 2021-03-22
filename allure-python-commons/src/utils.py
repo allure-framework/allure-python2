@@ -224,6 +224,9 @@ def func_parameters(func, *args, **kwargs):
     >>> args_kwargs(1, 2, 5, 6)
     [('a', '1'), ('b', '2'), ('c', '5'), ('d', '6')]
 
+    >>> args_kwargs(1, b=2)
+    [('a', '1'), ('b', '2'), ('c', '3'), ('d', '4')]
+
     >>> @helper
     ... def varargs(*a):
     ...     pass
@@ -307,7 +310,7 @@ def func_parameters(func, *args, **kwargs):
     args_dict = dict(zip(arg_spec.args, args))
 
     if arg_spec.defaults:
-        kwargs_defaults_dict = dict(zip(arg_spec.args[len(args):], arg_spec.defaults))
+        kwargs_defaults_dict = dict(zip(arg_spec.args[-len(arg_spec.defaults):], arg_spec.defaults))
         parameters.update(kwargs_defaults_dict)
 
     if arg_spec.varargs:
