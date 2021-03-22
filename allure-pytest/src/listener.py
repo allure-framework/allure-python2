@@ -112,6 +112,7 @@ class AllureListener(object):
         yield
         uuid = self._cache.get(item.nodeid)
         test_result = self.allure_logger.get_test(uuid)
+        params = item.callspec.params if hasattr(item, 'callspec') else {}
         test_result.labels.extend([Label(name=name, value=value) for name, value in allure_labels(item)])
         test_result.labels.extend([Label(name=LabelType.TAG, value=value) for value in pytest_markers(item)])
         test_result.labels.extend([Label(name=name, value=value) for name, value in allure_suite_labels(item)])
@@ -120,7 +121,7 @@ class AllureListener(object):
         test_result.labels.append(Label(name=LabelType.FRAMEWORK, value='pytest'))
         test_result.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
         test_result.labels.append(Label(name='package', value=allure_package(item)))
-        test_result.links.extend([Link(link_type, url, name) for link_type, url, name in allure_links(item)])
+        test_result.links.extend([Link(link_type, url, name) for link_type, url, name in allure_links(item, params)])
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_fixture_setup(self, fixturedef, request):

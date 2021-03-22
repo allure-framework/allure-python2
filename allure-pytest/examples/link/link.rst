@@ -22,3 +22,14 @@ Links
     ... def test_custom_link():
     ...     pass
 
+    >>> import pytest
+    >>> @allure.link("{link}")
+    >>> @pytest.mark.parametrize("test, link", [(True, 'link/666'), (False, 'link/777')])
+    >>> def test_parametrize_link(test, link):
+    ...     assert test
+
+    >>> @allure.issue("{issue}")
+    >>> @allure.testcase("{testcase}")
+    >>> @pytest.mark.parametrize("test, issue, testcase", [(True, 'issues/666', 'testcase/666'), (False, 'issues/777', 'testcase/777')])
+    >>> def test_parametrize_link_multiple(test, issue, testcase):
+    ...     assert test

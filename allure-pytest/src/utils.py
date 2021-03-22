@@ -73,9 +73,9 @@ def allure_labels(item):
     return labels
 
 
-def allure_links(item):
+def allure_links(item, parameters):
     for mark in item.iter_markers(name=ALLURE_LINK_MARK):
-        yield (mark.kwargs["link_type"], mark.args[0], mark.kwargs["name"])
+        yield (mark.kwargs["link_type"], mark.args[0].format(**parameters), mark.kwargs["name"].format(**parameters))
 
 
 def pytest_markers(item):
