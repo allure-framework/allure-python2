@@ -11,8 +11,7 @@ def get_step_name(node, step):
     name = "{step_keyword} {step_name}".format(step_keyword=step.keyword, step_name=step.name)
     if hasattr(node, 'callspec'):
         for key, value in node.callspec.params.items():
-            name = name.replace("<{key}>".format(key=key), "<{{{key}}}>".format(key=key))
-            name = name.format(**node.callspec.params)
+            name = name.replace(key, value)
     return name
 
 
