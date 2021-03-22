@@ -7,6 +7,9 @@ from allure_commons.model2 import Parameter
 from allure_commons.utils import format_exception
 
 
+ALLURE_LINK_MARK = 'allure_link'
+
+
 def get_step_name(node, step):
     name = "{step_keyword} {step_name}".format(step_keyword=step.keyword, step_name=step.name)
     if hasattr(node, 'callspec'):
@@ -50,3 +53,8 @@ def get_params(node):
     if hasattr(node, 'callspec'):
         params = node.callspec.params
         return [Parameter(name=name, value=value) for name, value in params.items()]
+
+
+def allure_links(item):
+    for mark in item.iter_markers(name=ALLURE_LINK_MARK):
+        yield (mark.kwargs["link_type"], mark.args[0], mark.kwargs["name"])
