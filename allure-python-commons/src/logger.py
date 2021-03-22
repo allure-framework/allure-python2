@@ -27,6 +27,8 @@ class AllureFileLogger(object):
                     f = os.path.join(report_dir, f)
                     if os.path.isfile(f):
                         os.unlink(f)
+                    else:
+                        shutil.rmtree(f)
 
     def _report_item(self, item):
         indent = INDENT if os.environ.get("ALLURE_INDENT_OUTPUT") else None
