@@ -29,3 +29,4 @@ Feature: Scenario
     When run pytest-bdd with allure
     Then allure report has result for "Simple passed example" scenario
     Then this scenario has passed status
+    Then this scenario has a history id

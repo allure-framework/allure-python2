@@ -8,6 +8,7 @@ from allure_commons_test.result import with_status
 from allure_commons_test.result import has_step
 # from allure_commons_test.result import has_attachment
 from allure_commons_test.result import has_parameter
+from allure_commons_test.result import has_history_id
 # from allure_commons_test.result import has_status_details
 # from allure_commons_test.result import with_message_contains
 # from allure_commons_test.result import has_link
@@ -39,6 +40,13 @@ def match_scenario(allure_report, context, scenario_name):
 def item_status(allure_report, context, item, status):
     context_matcher = context[item]
     matcher = partial(context_matcher, with_status, status)
+    assert_that(allure_report, matcher())
+
+
+@then(parsers.parse("this {item:w} has a history id"))
+def item_history_id(allure_report, context, item):
+    context_matcher = context[item]
+    matcher = partial(context_matcher, has_history_id)
     assert_that(allure_report, matcher())
 
 
