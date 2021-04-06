@@ -75,13 +75,13 @@ def get_status_details(exc_type, exception, exc_traceback):
 
 
 def step_status(result):
-    if result.exception:
-        return get_status(result.exception)
+    if isinstance(result.status, Enum):
+        status = STATUS.get(result.status.name, None)
     else:
-        if isinstance(result.status, Enum):
-            return STATUS.get(result.status.name, None)
-        else:
-            return STATUS.get(result.status, None)
+        status = STATUS.get(result.status, None)
+    if status != Status.SKIPPED and result.exception:
+        status = get_status(result.exception)
+    return status
 
 
 def get_status(exception):
