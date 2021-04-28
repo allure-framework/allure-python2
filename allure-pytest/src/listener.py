@@ -188,6 +188,10 @@ class AllureListener(object):
             message = 'XPASS {reason}'.format(reason=reason) if reason else 'XPASS'
             status_details = StatusDetails(message=message)
 
+        for mark in item.iter_markers(name='skip'):
+            if mark.kwargs["reason"] == 'unknown':
+                status = Status.UNKNOWN
+
         if report.when == 'setup':
             test_result.status = status
             test_result.statusDetails = status_details
